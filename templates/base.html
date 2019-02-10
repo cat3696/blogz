@@ -2,11 +2,20 @@
 <html>
     <head>
         <title>{{title}}</title>
+        
     </head>
-<body>
+    <body>
+        <h1>Build-A-Blog</h1>
 
-    {% block content %}
-    {% endblock %}
+        <nav>
+            <a href='/blog'>View Blog</a> | 
+            <a href='/newpost'>New Post</a>
+        </nav>
+            
+        <hr />
 
-</body>
+        {% block content %}
+        {% endblock %}
+
+    </body>
 </html>
