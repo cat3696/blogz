@@ -1,6 +1,8 @@
-from flask import Flask, request, redirect, render_template, session, flash 
+from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
-
+# Imports for timestamps and password hashing utilities.
+from datetime import datetime
+from hashutils import make_pw_hash, check_pw_hash
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -15,11 +17,14 @@ class Blog(db.Model):
     title = db.Column(db.String(400))
     body = db.Column(db.String(2000))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    pub_date = db.Column(db.DateTime)
 #amend blog constructor  to take user object 
     def __init__(self, title, body, owner):
         self.title = title
         self.body = body
         self.owner = owner
+    if pub_date = dtatetime.utc.now()
+    self.pub_date = pub_date
 
 #Create user class with id, username, password, blogs
 class User(db.Model):
@@ -30,10 +35,23 @@ class User(db.Model):
 
     def _init_(self, username, password):
         self.usernme = username
-        self.password = password
-    
-    def _repr_(self):
-        return str(self.username) 
+        self.pw_hash = make_pw_hash(password)
+ 
+ # Required so that user is allowed to visit specific routes prior to logging in.
+# Redirects to login page once encountering a page without permission.
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup', 'blog', 'home', 'static']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
+@app.route('/')
+def index():
+    #blogs = Blog.query.all()
+    #return render_template('blog.html', title="Build a Blog", blogs=blogs)
+    users = User.query.all()
+    return render_template('home.html', users=users)
+
 # Create login route - validation and verification of user information in database.
 @app.route('/login', methods=['POST','GET'])
 def login():
@@ -59,14 +77,14 @@ def login():
 @app.route("/signup", methods=['POST', 'GET'])
 def signup():
         if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        verify = request.form['verify']
-        exist = User.query.filter_by(username=username).first()
+            username = request.form['username']
+            password = request.form['password']
+            verify = request.form['verify']
+            exist = User.query.filter_by(username=username).first()
 
-        username_error = ""
-        password_error = ""
-        verify_error = ""
+            username_error = ""
+            password_error = ""
+            verify_error = ""
 
         if username == "":
             username_error = "Please enter a username."
@@ -100,10 +118,8 @@ def signup():
             )
 
     return render_template('signup.html')
-@app.route('/')
-def index():
-    blogs = Blog.query.all()
-    return render_template('blog.html', title="Build a Blog", blogs=blogs)
+# Required so that user is allowed to visit specific routes prior to logging in.
+# Redirects to login page once encountering a page without permission.
 
 @app.route('/blog', methods=['POST', 'GET'])
 def show_blog():
@@ -147,6 +163,11 @@ def create_new_post():
             return render_template('new_post.html', title="Build a Blog", blogs=blogs,
                 blog_title=blog_title, title_error=title_error, 
                 blog_body=blog_body, body_error=body_error)
+# Logout - deletes current user session, redirects to index.
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run()
