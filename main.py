@@ -21,7 +21,7 @@ class Blog(db.Model):
         self.body = body
         self.owner = owner
 
-#Create user class with id, usernme, password, blogs
+#Create user class with id, username, password, blogs
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
     username = db.column(db.String(60), unique=True)
@@ -34,7 +34,7 @@ class User(db.Model):
     
     def _repr_(self):
         return str(self.username) 
-        
+
 @app.route('/')
 def index():
     blogs = Blog.query.all()
@@ -62,6 +62,7 @@ def create_new_post():
         blog_title = request.form['title']
         blog_body = request.form['body']
         new_blog = Blog(blog_title, blog_body)
+        owner = user.query.filter_by(username=session['username']).first()
 
         title_error = ''
         body_error = ''
@@ -74,7 +75,7 @@ def create_new_post():
         if not title_error and not body_error:
             db.session.add(new_blog)
             db.session.commit()
-            return redirect('/blog?id={}'.format(new_blog.id))
+            return redirect('/blog?id={0}'.format(new_blog.id))
         
         else:
             blogs = Blog.query.all()
