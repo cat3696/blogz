@@ -4,21 +4,37 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:password@localhost:8889/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:blogzword@localhost:3306/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
 
 class Blog(db.Model):
-
+#amend to add owner_id
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(400))
     body = db.Column(db.String(2000))
-
-    def __init__(self, title, body):
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+#amend blog constructor  to take user object 
+    def __init__(self, title, body, owner):
         self.title = title
         self.body = body
+        self.owner = owner
 
+#Create user class with id, usernme, password, blogs
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True) 
+    username = db.column(db.String(60), unique=True)
+    password = db.Column(db.String(85))
+    blogs = db.relationship('blog',backref='owner')
+
+    def _init_(self, username, password):
+        self.usernme = username
+        self.password = password
+    
+    def _repr_(self):
+        return str(self.username) 
+        
 @app.route('/')
 def index():
     blogs = Blog.query.all()
