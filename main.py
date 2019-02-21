@@ -119,7 +119,7 @@ def signup():
             verify_error=verify_error
             )
 
-    return render_template('signup.html')
+  #return render_template('signup.html')
 # Required so that user is allowed to visit specific routes prior to logging in.
 # Redirects to login page once encountering a page without permission.
 
