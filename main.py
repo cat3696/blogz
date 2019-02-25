@@ -80,6 +80,9 @@ def signup():
     username_error = ""
     password_error = ""
     verify_error = ""
+    password_length_errror= ""
+    username_length_error= ""
+    user_exists = "" 
     if request.method == 'POST':
 
         user_name = request.form['username']
@@ -87,21 +90,17 @@ def signup():
         user_password_validate = request.form['verify']
 
         if not user_name or not user_password or not user_password_validate:
-            print('All fields must be filled in', 'error')
-            return render_template('signup.html', username_error= "Incorrect username or username doesn't meet 3 character requirement.")
+            return render_template('signup.html', username_error= "All fields must be filled in.")
 
         if user_password != user_password_validate:
             return render_template('signup.html', verify_error= "Passwords must match.")
 
-        if len(user_password) < 3 and len(user_name) < 3:
-           
-            return render_template('signup.html', password_error = "Password must be at least 3 characters.")
-
         if len(user_password) < 3:
-           return render_template('signup.html', password_error = "Password must be at least 3 characters.")
+           
+            return render_template('signup.html', password_length_error = "Password must be at least 3 characters.")
 
         if len(user_name) < 3:
-           return render_template('signup.html', username_error= "Incorrect username or username doesn't meet 3 character requirement.")
+           return render_template('signup.html', username_length_error= "Username doesn't meet 3 character requirement.")
             
         existing_user = User.query.filter_by(username=user_name).first()
 
@@ -117,8 +116,8 @@ def signup():
             print('New user created', 'success')
             return redirect('/newpost')
         else:
-            print('Error, there is an existing user with the same username', 'error')
-            return render_template('signup.html')
+            
+            return render_template('signup.html', user_exists ='There is an existing user with the same username.')
     else:
             return render_template('signup.html')
 

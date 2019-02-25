@@ -3,7 +3,12 @@
 {% block content %}
 
 <h1>{{ title }}</h1>
-
+<!-- username_error = ""
+password_error = ""
+verify_error = ""
+password_length_errror= ""
+username_length_error= ""
+user_exists = ""-->
 <form action="/signup" method="post">
     <table>
         <tr>
@@ -13,6 +18,8 @@
             <td>
                 <input name="username" type="text" value="{{ username }}">
                 <p class= "error"> {{ username_error }} </p>
+                <p class= "error"> {{ username_length_error }} </p>
+                <p class= "error"> {{ user_exists }} </p>
             </td>
 
         </tr>
@@ -23,6 +30,7 @@
             <td>
                 <input name="password" type="password">
                 <p class= "error"> {{ password_error }} </p>
+                <p class= "error"> {{ password_length_error }} </p>
             </td>
 
         </tr>
