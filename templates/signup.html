@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -12,11 +12,9 @@
             </td>
             <td>
                 <input name="username" type="text" value="{{ username }}">
-                <p class= "error"> {{ name_error }} </p>
+                <p class= "error"> {{ username_error }} </p>
             </td>
-            <td>
-                <p> Username cannot be blank. </p>
-            </td>
+
         </tr>
         <tr>
             <td>
@@ -24,11 +22,9 @@
             </td>
             <td>
                 <input name="password" type="password">
-                <p class= "error"> {{ pass_error }} </p>
+                <p class= "error"> {{ password_error }} </p>
             </td>
-            <td>
-                <p> Password cannot be blank and must have at least 3 characters. </p>
-            </td>
+
         </tr>
         <tr>
             <td>
@@ -42,6 +38,4 @@
     </table>
     <input type="submit" value="signup">
 </form>
-
-
-{% endblock %}
+{% endblock %} 
