@@ -38,20 +38,19 @@ class User(db.Model):
     def __init__(self, username, password):
         self.username = username
         self.password = make_pw_hash(password)
- # Required so that user is allowed to visit specific routes prior to logging in.
-# Redirects to login  once encountering a page without permission.
+
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup', 'blog', 'home']
+    allowed_routes = ['login', 'signup', 'show_blog', 'home', 'index']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 @app.route('/')
 def index():
-    #blogs = Blog.query.all()
-    #return render_template('blog.html', title="Build a Blog", blogs=blogs)
-    users = User.query.all()
-    return render_template('home.html', users=users)
+
+   all_users = User.query.all()
+   # return render_template('home.html', users=users)
+   return render_template('home.html', list_all_users=all_users)
 
 # Create login route - validation and verification of user information in database.
 @app.route('/login', methods=['POST','GET'])
@@ -122,26 +121,26 @@ def signup():
             return render_template('signup.html')
 
 
-  #return render_template('signup.html')
-# Required so that user is allowed to visit specific routes prior to logging in.
-# Redirects to login page once encountering a page without permission.
+
+
+# Redirect to login 
 
 @app.route('/blog', methods=['POST', 'GET'])
 def show_blog():
     blog_id = request.args.get('id')
     user_id = request.args.get('userid')
-    # posts = Blog.query.all()
-    # Recent blog posts order to top.
-    posts = Blog.query.order_by(Blog.pub_date.desc())
+    #post = Blog.query.order_by(Blog.pub_date.desc())
 
     if blog_id:
         post = Blog.query.filter_by(id=blog_id).first()
         return render_template("single_post.html", title=post.title, body=post.body, user=post.owner.username, pub_date=post.pub_date, user_id=post.owner_id)
-    if user_id:
-        entries = Blog.query.filter_by(owner_id=user_id).all()
-        return render_template('user.html', entries=entries)
-
-    return render_template('blog.html', posts=posts)
+    else:
+        if user_id:
+            post = Blog.query.filter_by(owner_id=user_id).all()
+            return render_template('user.html', posts=post)
+        else:
+            all_blog_posts = Blog.query.all()
+            return render_template('blog.html', posts=all_blog_posts)
 
     
 @app.route('/newpost', methods=['POST', 'GET'])
